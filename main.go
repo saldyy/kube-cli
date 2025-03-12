@@ -1,7 +1,5 @@
 /*
-
-Copyright © 2025 NAME HERE png9981@gmail.com
-
+Copyright © 2025 Phillip Nguyen <png9981@gmail.com>
 */
 package main
 
