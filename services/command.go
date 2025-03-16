@@ -27,7 +27,7 @@ func RunCommand(command string, opt CommandOptions) {
 	err := cmd.Run()
 
 	if err != nil {
-		log.Fatal("Cannot run command", command, err)
+		log.Fatal(fmt.Sprintf("Cannot run command: %s, args: %v\n\n", command, args), err)
 	}
 }
 

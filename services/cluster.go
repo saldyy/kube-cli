@@ -38,7 +38,7 @@ func InitCluster() {
 
 func DestroyCluster() {
 	args := []string{
-		"destroy",
+		"delete",
 		"-p",
 		PROFILE_NAME,
 	}
