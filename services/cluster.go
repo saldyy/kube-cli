@@ -1,61 +1,92 @@
 package services
 
-import (
-	"bufio"
-	"fmt"
-	"io"
-	"log"
-	"os/exec"
-)
-
 const PROFILE_NAME = "saldyy"
+
+type Dependencies struct {
+	HelmRepo string
+	Name     string
+}
+
+var dependencies = []Dependencies{
+	{
+		HelmRepo: "https://istio-release.storage.googleapis.com/charts",
+		Name:     "istio",
+	},
+	{
+		HelmRepo: "https://kubernetes-sigs.github.io/metrics-server/",
+		Name:     "metric-server",
+	},
+}
 
 func InitCluster() {
 	args := []string{
-		"start", "-p", PROFILE_NAME, "--addons", "metallb,metrics-server", "--cpus=4", "--memory=16GB",
+		"start",
+		"-p",
+		PROFILE_NAME,
+		"--addons",
+		"metallb",
+		"--cpus=4",
+		"--memory=4000mb",
+		"--kubernetes-version=v1.31.0",
 	}
 
-	cmd := exec.Command("minikube", args...)
-	// Get output pipes
-	stdoutPipe, err := cmd.StdoutPipe()
+	RunCommand("minikube", CommandOptions{Args: args, WithOutput: true})
 
-	if err != nil {
-		log.Fatal("Error getting StdoutPipe:", err)
-	}
-
-	stderrPipe, err := cmd.StderrPipe()
-	if err != nil {
-		log.Fatal("Error getting StderrPipe:", err)
-		return
-	}
-
-	if err := cmd.Start(); err != nil {
-		log.Fatal(err)
-	}
-	// Stream output in separate goroutines
-	go streamOutput(&stdoutPipe, "STDOUT")
-	go streamOutput(&stderrPipe, "STDERR")
-
-	// Wait for command to complete
-	if err := cmd.Wait(); err != nil {
-		fmt.Println("Error waiting for command:", err)
-	}
-}
-
-// streamOutput reads from the provided pipe and prints to the console
-func streamOutput(pipe *io.ReadCloser, prefix string) {
-	scanner := bufio.NewScanner(*pipe)
-	for scanner.Scan() {
-		fmt.Printf("[%s] %s\n", prefix, scanner.Text())
-	}
-	if err := scanner.Err(); err != nil {
-		fmt.Printf("Error reading from %s: %v\n", prefix, err)
-	}
+  UpdateHelmCharts()
+  installIstio()
 }
 
 func DestroyCluster() {
-	cmd := exec.Command("minikube", "delete", "-p", PROFILE_NAME)
-	if err := cmd.Run(); err != nil {
-		log.Fatal(err)
+	args := []string{
+		"destroy",
+		"-p",
+		PROFILE_NAME,
 	}
+
+	RunCommand("minikube", CommandOptions{Args: args, WithOutput: true})
+}
+
+func UpdateHelmCharts() {
+	for _, d := range dependencies {
+		args := []string{
+			"repo", "add", d.Name, d.HelmRepo,
+		}
+		RunCommand("helm", CommandOptions{Args: args})
+	}
+
+	RunCommand("helm", CommandOptions{Args: []string{"repo", "update"}})
+}
+
+func installIstio() {
+	// Install base components
+	args := []string{
+		"install",
+		"istio-base",
+		"istio/base",
+		"-n",
+		"istio-system",
+		"--create-namespace",
+	}
+	RunCommand("helm", CommandOptions{Args: args})
+
+	// Install Istio discovery
+	args = []string{
+		"install",
+		"istiod",
+		"istio/istiod",
+		"-n",
+		"istio-system",
+	}
+	RunCommand("helm", CommandOptions{Args: args})
+
+	// Install Istio Ingress gateway
+	args = []string{
+		"install",
+		"istio-ingress",
+		"istio/gateway",
+		"-n",
+		"istio-system",
+	}
+	RunCommand("helm", CommandOptions{Args: args})
+
 }
