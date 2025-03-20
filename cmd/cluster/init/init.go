@@ -8,8 +8,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// initCmd represents the init command
-var initCmd = &cobra.Command{
+// InitCmd represents the init command
+var InitCmd = &cobra.Command{
 	Use:   "init",
 	Short: "The init command sets up a local Kubernetes cluster using Minikube.",
 	Long: `The init command sets up a local Kubernetes cluster using Minikube.
@@ -23,7 +23,6 @@ making it easy to start developing and testing Kubernetes applications locally.`
 }
 
 func init() {
-	rootCmd.AddCommand(initCmd)
 
 	// Here you will define your flags and configuration settings.
 

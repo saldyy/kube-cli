@@ -8,8 +8,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// destroyCmd represents the destroy command
-var destroyCmd = &cobra.Command{
+// DestroyCmd represents the destroy command
+var DestroyCmd = &cobra.Command{
 	Use:   "destroy",
 	Short: "A brief description of your command",
 	Long: `A longer description that spans multiple lines and likely contains examples
@@ -24,7 +24,6 @@ to quickly create a Cobra application.`,
 }
 
 func init() {
-	rootCmd.AddCommand(destroyCmd)
 
 	// Here you will define your flags and configuration settings.
 

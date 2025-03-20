@@ -16,9 +16,20 @@ var dependencies = []Dependencies{
 		HelmRepo: "https://kubernetes-sigs.github.io/metrics-server/",
 		Name:     "metric-server",
 	},
+	{
+		HelmRepo: "https://charts.jetstack.io",
+		Name:     "jetstack",
+	},
 }
 
 func InitCluster() {
+	ResumeCluster()
+
+	UpdateHelmCharts()
+	installIstio()
+}
+
+func ResumeCluster() {
 	args := []string{
 		"start",
 		"-p",
@@ -31,9 +42,11 @@ func InitCluster() {
 	}
 
 	RunCommand("minikube", CommandOptions{Args: args, WithOutput: true})
+}
 
-  UpdateHelmCharts()
-  installIstio()
+func UpdateCluster() {
+	UpdateHelmCharts()
+	installIstio()
 }
 
 func DestroyCluster() {
@@ -88,5 +101,37 @@ func installIstio() {
 		"istio-system",
 	}
 	RunCommand("helm", CommandOptions{Args: args})
+}
 
+func installCertManager() {
+	// Install base components
+	args := []string{
+		"install",
+		"istio-base",
+		"istio/base",
+		"-n",
+		"istio-system",
+		"--create-namespace",
+	}
+	RunCommand("helm", CommandOptions{Args: args})
+
+	// Install Istio discovery
+	args = []string{
+		"install",
+		"istiod",
+		"istio/istiod",
+		"-n",
+		"istio-system",
+	}
+	RunCommand("helm", CommandOptions{Args: args})
+
+	// Install Istio Ingress gateway
+	args = []string{
+		"install",
+		"istio-ingress",
+		"istio/gateway",
+		"-n",
+		"istio-system",
+	}
+	RunCommand("helm", CommandOptions{Args: args})
 }
