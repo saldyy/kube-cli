@@ -2,6 +2,7 @@ package services
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"io"
 	"log"
@@ -19,6 +20,9 @@ func RunCommand(command string, opt CommandOptions) {
 
 	cmd := exec.Command(command, args...)
 
+	var stderr bytes.Buffer
+	cmd.Stderr = &stderr
+
 	if shouldPipeOutput {
 		runWithOutput(cmd)
 		return
@@ -27,7 +31,9 @@ func RunCommand(command string, opt CommandOptions) {
 	err := cmd.Run()
 
 	if err != nil {
-		log.Fatal(fmt.Sprintf("Cannot run command: %s, args: %v\n\n", command, args), err)
+		log.Printf("Cannot run command: %s, args: %v\n\n", command, args)
+		log.Printf("Error: %v\n", err)
+		log.Printf("Stderr: %s\n", stderr.String())
 	}
 }
 

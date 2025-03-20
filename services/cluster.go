@@ -47,6 +47,7 @@ func ResumeCluster() {
 func UpdateCluster() {
 	UpdateHelmCharts()
 	installIstio()
+	installCertManager()
 }
 
 func DestroyCluster() {
@@ -107,31 +108,13 @@ func installCertManager() {
 	// Install base components
 	args := []string{
 		"install",
-		"istio-base",
-		"istio/base",
+		"cert-manager",
+		"jetstack/cert-manager",
 		"-n",
-		"istio-system",
+		"cert-manager",
 		"--create-namespace",
-	}
-	RunCommand("helm", CommandOptions{Args: args})
-
-	// Install Istio discovery
-	args = []string{
-		"install",
-		"istiod",
-		"istio/istiod",
-		"-n",
-		"istio-system",
-	}
-	RunCommand("helm", CommandOptions{Args: args})
-
-	// Install Istio Ingress gateway
-	args = []string{
-		"install",
-		"istio-ingress",
-		"istio/gateway",
-		"-n",
-		"istio-system",
+		"-f",
+		"./manifests/cert-manager.yaml",
 	}
 	RunCommand("helm", CommandOptions{Args: args})
 }
