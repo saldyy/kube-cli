@@ -7,6 +7,7 @@ import (
 	"os"
 
 	cluster "github.com/saldyy/kube-cli/cmd/cluster"
+	svc "github.com/saldyy/kube-cli/cmd/svc"
 	"github.com/spf13/cobra"
 )
 
@@ -36,6 +37,7 @@ func Execute() {
 
 func init() {
 	rootCmd.AddCommand(cluster.ClusterCmd)
+	rootCmd.AddCommand(svc.SvcCmd)
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.

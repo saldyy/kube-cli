@@ -4,17 +4,12 @@ Copyright © 2025 Phillip Nguyen <png9981@gmail.com>
 package cmd
 
 import (
-	clusterDestroy "github.com/saldyy/kube-cli/cmd/cluster/destroy"
-	clusterInit "github.com/saldyy/kube-cli/cmd/cluster/init"
-	clusterResume "github.com/saldyy/kube-cli/cmd/cluster/resume"
-	clusterUpdate "github.com/saldyy/kube-cli/cmd/cluster/update"
-
 	"github.com/spf13/cobra"
 )
 
-// ClusterCmd represents the cluster command
-var ClusterCmd = &cobra.Command{
-	Use:   "cluster",
+// SvcCmd represents the cluster command
+var SvcCmd = &cobra.Command{
+	Use:   "svc",
 	Short: "A brief description of your command",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
@@ -25,11 +20,6 @@ to quickly create a Cobra application.`,
 }
 
 func init() {
-	ClusterCmd.AddCommand(clusterInit.InitCmd)
-	ClusterCmd.AddCommand(clusterUpdate.UpdateCmd)
-	ClusterCmd.AddCommand(clusterDestroy.DestroyCmd)
-	ClusterCmd.AddCommand(clusterResume.ResumeCmd)
-
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
