@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"log"
 	"os/exec"
 )
 
@@ -20,9 +19,6 @@ func RunCommand(command string, opt CommandOptions) {
 
 	cmd := exec.Command(command, args...)
 
-	var stderr bytes.Buffer
-	cmd.Stderr = &stderr
-
 	if shouldPipeOutput {
 		runWithOutput(cmd)
 		return
@@ -30,29 +26,32 @@ func RunCommand(command string, opt CommandOptions) {
 
 	err := cmd.Run()
 
+	var stderr bytes.Buffer
+	cmd.Stderr = &stderr
+
 	if err != nil {
-		log.Printf("Cannot run command: %s, args: %v\n\n", command, args)
-		log.Printf("Error: %v\n", err)
-		log.Printf("Stderr: %s\n", stderr.String())
+		fmt.Printf("Cannot run command: %s, args: %v\n\n", command, args)
+		fmt.Printf("Error: %v\n", err)
+		fmt.Printf("Stderr: %s\n", stderr.String())
 	}
 }
 
 func runWithOutput(cmd *exec.Cmd) {
+	fmt.Printf("INheree\n")
 	// Get output pipes
 	stdoutPipe, err := cmd.StdoutPipe()
 
 	if err != nil {
-		log.Fatal("Error getting StdoutPipe:", err)
+		fmt.Printf("Error getting StdoutPipe: %v\n", err)
 	}
 
 	stderrPipe, err := cmd.StderrPipe()
 	if err != nil {
-		log.Fatal("Error getting StderrPipe:", err)
-		return
+		fmt.Printf("Error getting StderrPipe: %v\n", err)
 	}
 
 	if err := cmd.Start(); err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
 	}
 	// Stream output in separate goroutines
 	go streamOutput(&stdoutPipe, "STDOUT")

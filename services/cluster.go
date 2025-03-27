@@ -25,8 +25,10 @@ var dependencies = []Dependencies{
 func InitCluster() {
 	ResumeCluster()
 
-	UpdateHelmCharts()
-	installIstio()
+	// UpdateHelmCharts()
+
+	// installIstio()
+	// installCertManager()
 }
 
 func ResumeCluster() {

@@ -4,8 +4,6 @@ Copyright © 2025 Phillip Nguyen <png9981@gmail.com>
 package cmd
 
 import (
-	"fmt"
-
 	clusterDestroy "github.com/saldyy/kube-cli/cmd/cluster/destroy"
 	clusterInit "github.com/saldyy/kube-cli/cmd/cluster/init"
 	clusterResume "github.com/saldyy/kube-cli/cmd/cluster/resume"
@@ -25,7 +23,6 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("cluster called")
 	},
 }
 
