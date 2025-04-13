@@ -1,5 +1,7 @@
 package services
 
+import "fmt"
+
 const PROFILE_NAME = "saldyy"
 
 type Dependencies struct {
@@ -28,7 +30,7 @@ func InitCluster() {
 	UpdateHelmCharts()
 
 	installIstio()
-	installCertManager()
+	//installCertManager()
 }
 
 func ResumeCluster() {
@@ -49,7 +51,7 @@ func ResumeCluster() {
 func UpdateCluster() {
 	UpdateHelmCharts()
 	installIstio()
-	installCertManager()
+	//installCertManager()
 }
 
 func DestroyCluster() {
@@ -63,6 +65,7 @@ func DestroyCluster() {
 }
 
 func UpdateHelmCharts() {
+	fmt.Printf("Updating Helm repositories...\n")
 	for _, d := range dependencies {
 		args := []string{
 			"repo", "add", d.Name, d.HelmRepo,
@@ -71,10 +74,12 @@ func UpdateHelmCharts() {
 	}
 
 	RunCommand("helm", CommandOptions{Args: []string{"repo", "update"}})
+	fmt.Printf("Finished update Helm repositories...\n")
 }
 
 func installIstio() {
 	// Install base components
+	fmt.Printf("Installing Istio...\n")
 	args := []string{
 		"install",
 		"istio-base",
@@ -104,10 +109,12 @@ func installIstio() {
 		"istio-system",
 	}
 	RunCommand("helm", CommandOptions{Args: args})
+	fmt.Printf("Finish install Istio...\n")
 }
 
 func installCertManager() {
 	// Install base components
+	fmt.Printf("Installing Cert Manager...\n")
 	args := []string{
 		"install",
 		"cert-manager",
@@ -119,4 +126,5 @@ func installCertManager() {
 		"./manifests/cert-manager.yaml",
 	}
 	RunCommand("helm", CommandOptions{Args: args})
+	fmt.Printf("Finish install Cert Manager...\n")
 }
