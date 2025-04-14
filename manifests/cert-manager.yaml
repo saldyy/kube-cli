@@ -47,7 +47,7 @@ global:
 
   leaderElection:
     # Override the namespace used for the leader election lease.
-    namespace: "kube-system"
+    namespace: "cert-manager"
 
     # The duration that non-leader candidates will wait after observing a
     # leadership renewal until attempting to acquire leadership of a led but
@@ -72,7 +72,7 @@ global:
 crds:
   # This option decides if the CRDs should be installed
   # as part of the Helm installation.
-  enabled: false
+  enabled: true
 
   # This option makes it so that the "helm.sh/resource-policy": keep
   # annotation is added to the CRD. This will prevent Helm from uninstalling
@@ -212,14 +212,14 @@ enableCertificateOwnerRef: false
 # the version by specifying the `apiVersion` yourself.
 #
 # For example:
-#  config:
+# config:
 #    apiVersion: controller.config.cert-manager.io/v1alpha1
 #    kind: ControllerConfiguration
 #    logging:
 #      verbosity: 2
 #      format: text
 #    leaderElectionConfig:
-#      namespace: kube-system
+#      namespace: cert-manager
 #    kubernetesAPIQPS: 9000
 #    kubernetesAPIBurst: 9000
 #    numberOfConcurrentWorkers: 200
@@ -881,7 +881,7 @@ webhook:
 
 cainjector:
   # Create the CA Injector deployment
-  enabled: false
+  enabled: true
 
   # The number of replicas of the cert-manager cainjector to run.
   #
