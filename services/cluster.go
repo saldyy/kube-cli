@@ -1,6 +1,10 @@
 package services
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+	"strings"
+)
 
 const PROFILE_NAME = "saldyy"
 
@@ -30,28 +34,35 @@ func InitCluster() {
 	UpdateHelmCharts()
 
 	installIstio()
-	//installCertManager()
+	installCertManager()
 }
 
 func ResumeCluster() {
+	homeDir := os.Getenv("HOME")
+
 	args := []string{
 		"start",
 		"-p",
 		PROFILE_NAME,
-		"--addons",
-		"metallb",
 		"--cpus=4",
 		"--memory=4000mb",
 		"--kubernetes-version=v1.31.0",
+		"--mount",
+		fmt.Sprintf("--mount-string=%s/.kube/local-cluster:/var/lib/minikube/certs/keys/irsa-key", homeDir),
+		"--extra-config=apiserver.service-account-key-file=/var/lib/minikube/certs/keys/irsa-key/sa-signer-pkcs8.pub",
+		"--extra-config=apiserver.service-account-signing-key-file=/var/lib/minikube/certs/keys/irsa-key/sa-signer.key",
+		"--extra-config=apiserver.service-account-issuer=https://s3.ap-southeast-1.amazonaws.com/local-cluster-identity",
+		"--extra-config=apiserver.api-audiences=sts.amazonaws.com",
 	}
 
+	fmt.Printf("Command: %s\n", strings.Join(args, " "))
 	RunCommand("minikube", CommandOptions{Args: args, WithOutput: true})
 }
 
 func UpdateCluster() {
 	UpdateHelmCharts()
 	installIstio()
-	//installCertManager()
+	installCertManager()
 }
 
 func DestroyCluster() {
