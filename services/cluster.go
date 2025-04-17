@@ -3,7 +3,6 @@ package services
 import (
 	"fmt"
 	"os"
-	"strings"
 )
 
 const PROFILE_NAME = "saldyy"
@@ -26,6 +25,10 @@ var dependencies = []Dependencies{
 		HelmRepo: "https://charts.jetstack.io",
 		Name:     "jetstack",
 	},
+	{
+		HelmRepo: "https://jkroepke.github.io/helm-charts/",
+		Name: 		"jkroepke",
+	},
 }
 
 func InitCluster() {
@@ -35,6 +38,7 @@ func InitCluster() {
 
 	installIstio()
 	installCertManager()
+	installEKSPodIdentityWebhook()
 }
 
 func ResumeCluster() {
@@ -55,7 +59,6 @@ func ResumeCluster() {
 		"--extra-config=apiserver.api-audiences=sts.amazonaws.com",
 	}
 
-	fmt.Printf("Command: %s\n", strings.Join(args, " "))
 	RunCommand("minikube", CommandOptions{Args: args, WithOutput: true})
 }
 
@@ -63,6 +66,7 @@ func UpdateCluster() {
 	UpdateHelmCharts()
 	installIstio()
 	installCertManager()
+	installEKSPodIdentityWebhook()
 }
 
 func DestroyCluster() {
@@ -138,4 +142,16 @@ func installCertManager() {
 	}
 	RunCommand("helm", CommandOptions{Args: args})
 	fmt.Printf("Finish install Cert Manager...\n")
+}
+
+func installEKSPodIdentityWebhook() {
+	// Install base components
+	fmt.Printf("Installing EKS Pod Identity Webhook...\n")
+	args := []string{
+		"install",
+		"amazon-eks-pod-identity-webhook",
+		"jkroepke/amazon-eks-pod-identity-webhook",
+	}
+	RunCommand("helm", CommandOptions{Args: args})
+	fmt.Printf("Finish install EKS Pod Identity Webhook...\n")
 }
