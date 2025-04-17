@@ -27,7 +27,7 @@ var dependencies = []Dependencies{
 	},
 	{
 		HelmRepo: "https://jkroepke.github.io/helm-charts/",
-		Name: 		"jkroepke",
+		Name:     "jkroepke",
 	},
 }
 
@@ -59,7 +59,7 @@ func ResumeCluster() {
 		"--extra-config=apiserver.api-audiences=sts.amazonaws.com",
 	}
 
-	RunCommand("minikube", CommandOptions{Args: args, WithOutput: true})
+	RunWithLiveOutput("minikube", args)
 }
 
 func UpdateCluster() {
@@ -76,7 +76,7 @@ func DestroyCluster() {
 		PROFILE_NAME,
 	}
 
-	RunCommand("minikube", CommandOptions{Args: args, WithOutput: true})
+	RunWithLiveOutput("minikube", args)
 }
 
 func UpdateHelmCharts() {
@@ -85,10 +85,10 @@ func UpdateHelmCharts() {
 		args := []string{
 			"repo", "add", d.Name, d.HelmRepo,
 		}
-		RunCommand("helm", CommandOptions{Args: args})
+		RunWithLiveOutput("helm", args)
 	}
 
-	RunCommand("helm", CommandOptions{Args: []string{"repo", "update"}})
+	RunWithLiveOutput("helm", []string{"repo", "update"})
 	fmt.Printf("Finished update Helm repositories...\n")
 }
 
@@ -103,7 +103,7 @@ func installIstio() {
 		"istio-system",
 		"--create-namespace",
 	}
-	RunCommand("helm", CommandOptions{Args: args})
+	RunWithLiveOutput("helm", args)
 
 	// Install Istio discovery
 	args = []string{
@@ -113,7 +113,7 @@ func installIstio() {
 		"-n",
 		"istio-system",
 	}
-	RunCommand("helm", CommandOptions{Args: args})
+	RunWithLiveOutput("helm", args)
 
 	// Install Istio Ingress gateway
 	args = []string{
@@ -123,7 +123,7 @@ func installIstio() {
 		"-n",
 		"istio-system",
 	}
-	RunCommand("helm", CommandOptions{Args: args})
+	RunWithLiveOutput("helm", args)
 	fmt.Printf("Finish install Istio...\n")
 }
 
@@ -140,7 +140,7 @@ func installCertManager() {
 		"-f",
 		"./manifests/cert-manager.yaml",
 	}
-	RunCommand("helm", CommandOptions{Args: args})
+	RunWithLiveOutput("helm", args)
 	fmt.Printf("Finish install Cert Manager...\n")
 }
 
@@ -152,6 +152,6 @@ func installEKSPodIdentityWebhook() {
 		"amazon-eks-pod-identity-webhook",
 		"jkroepke/amazon-eks-pod-identity-webhook",
 	}
-	RunCommand("helm", CommandOptions{Args: args})
+	RunWithLiveOutput("helm", args)
 	fmt.Printf("Finish install EKS Pod Identity Webhook...\n")
 }

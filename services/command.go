@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os/exec"
+	"strings"
 )
 
 type CommandOptions struct {
@@ -13,27 +14,51 @@ type CommandOptions struct {
 	WithOutput bool
 }
 
-func RunCommand(command string, opt CommandOptions) {
-	args := opt.Args
-	shouldPipeOutput := opt.WithOutput
-
+func RunWithLiveOutput(command string, args []string) error {
 	cmd := exec.Command(command, args...)
 
-	if shouldPipeOutput {
-		runWithOutput(cmd)
-		return
+	// Get output pipes
+	stdoutPipe, err := cmd.StdoutPipe()
+	if err != nil {
+		return fmt.Errorf("error getting StdoutPipe: %v", err)
 	}
 
-	err := cmd.Run()
+	stderrPipe, err := cmd.StderrPipe()
+	if err != nil {
+		return fmt.Errorf("error getting StderrPipe: %v", err)
+	}
+
+	if err := cmd.Start(); err != nil {
+		return fmt.Errorf("error starting command: %v", err)
+	}
+
+	// Stream output in separate goroutines
+	go streamOutput(&stdoutPipe, "STDOUT")
+	go streamOutput(&stderrPipe, "STDERR")
+
+	// Wait for command to complete
+	if err := cmd.Wait(); err != nil {
+		return fmt.Errorf("error waiting for command: %v", err)
+	}
+
+	return nil
+}
+
+func RunSilent(command string, args []string) (string, error) {
+	cmd := exec.Command(command, args...)
 
 	var stderr bytes.Buffer
+	var stdout bytes.Buffer
 	cmd.Stderr = &stderr
+	cmd.Stdout = &stdout
 
+	err := cmd.Run()
 	if err != nil {
-		fmt.Printf("Cannot run command: %s, args: %v\n\n", command, args)
-		fmt.Printf("Error: %v\n", err)
-		fmt.Printf("Stderr: %s\n", stderr.String())
+		return "", fmt.Errorf("cannot run command %s with args %v: %v\nStderr: %s",
+			command, args, err, stderr.String())
 	}
+
+	return strings.TrimSpace(stdout.String()), nil
 }
 
 func runWithOutput(cmd *exec.Cmd) {
